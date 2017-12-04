@@ -4,9 +4,9 @@ from bs4 import BeautifulSoup
 from coala_utils.decorators import generate_ordering
 
 
-@generate_ordering('timestamp', 'id', 'text', 'user', 'replies', 'retweets', 'likes')
+@generate_ordering('timestamp', 'id', 'text', 'user', 'replies', 'retweets', 'likes', 'lang', 'img_url')
 class Tweet:
-    def __init__(self, user, id, timestamp, fullname, text, replies, retweets, likes):
+    def __init__(self, user, id, timestamp, fullname, text, replies, retweets, likes, lang, img_url):
         self.user = user
         self.id = id
         self.timestamp = timestamp
@@ -15,9 +15,15 @@ class Tweet:
         self.replies = replies
         self.retweets = retweets
         self.likes = likes
+        self.lang = lang
+        self.img_url = img_url
 
     @classmethod
     def from_soup(cls, tweet):
+        if tweet.find('div', 'AdaptiveMedia-photoContainer'):
+            img_url = tweet.find('div', 'AdaptiveMedia-photoContainer').get('data-image-url')
+        else:
+            img_url = ""
         return cls(
             user=tweet.find('span', 'username').text[1:],
             id=tweet['data-item-id'],
@@ -34,6 +40,8 @@ class Tweet:
             likes = tweet.find(
                 'span', 'ProfileTweet-action--favorite u-hiddenVisually').find(
                     'span', 'ProfileTweet-actionCount')['data-tweet-stat-count'] or '0',
+            lang = tweet.find('p', 'tweet-text')['lang'] or '',
+            img_url = img_url
         )
 
     @classmethod
