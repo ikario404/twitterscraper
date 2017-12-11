@@ -4,9 +4,9 @@ from bs4 import BeautifulSoup
 from coala_utils.decorators import generate_ordering
 
 
-@generate_ordering('timestamp', 'id', 'text', 'user', 'replies', 'retweets', 'likes', 'lang', 'img_url')
+@generate_ordering('timestamp', 'id', 'text', 'user', 'replies', 'retweets', 'likes', 'lang', 'img_url', 'tweet_url')
 class Tweet:
-    def __init__(self, user, id, timestamp, fullname, text, replies, retweets, likes, lang, img_url):
+    def __init__(self, user, id, timestamp, fullname, text, replies, retweets, likes, lang, img_url, 'tweet_url'):
         self.user = user
         self.id = id
         self.timestamp = timestamp
@@ -17,6 +17,8 @@ class Tweet:
         self.likes = likes
         self.lang = lang
         self.img_url = img_url
+        self.tweet_url = tweet_url
+
 
     @classmethod
     def from_soup(cls, tweet):
@@ -41,7 +43,8 @@ class Tweet:
                 'span', 'ProfileTweet-action--favorite u-hiddenVisually').find(
                     'span', 'ProfileTweet-actionCount')['data-tweet-stat-count'] or '0',
             lang = tweet.find('p', 'tweet-text')['lang'] or '',
-            img_url = img_url
+            img_url = img_url,
+            tweet_url = tweet.find('div', 'tweet')['data-permalink-path'],
         )
 
     @classmethod
