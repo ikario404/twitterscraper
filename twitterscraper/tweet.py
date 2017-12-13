@@ -4,9 +4,11 @@ from bs4 import BeautifulSoup
 from coala_utils.decorators import generate_ordering
 
 
-@generate_ordering('timestamp', 'id', 'text', 'user', 'replies', 'retweets', 'likes', 'lang', 'img_url', 'tweet_url')
+@generate_ordering('timestamp', 'id', 'text', 'user', 'replies', 'retweets', 'likes', 'lang', 'img_url', 'tweet_url',
+ 'nb_mentionned_users', 'link_inside_twt', 'quote', 'media', 'mentionned_users')
 class Tweet:
-    def __init__(self, user, id, timestamp, fullname, text, replies, retweets, likes, lang, img_url, 'tweet_url'):
+    def __init__(self, user, id, timestamp, fullname, text, replies, retweets, likes, lang, img_url, tweet_url,
+     nb_mentionned_users, link_inside_twt, quote, media, mentionned_users):
         self.user = user
         self.id = id
         self.timestamp = timestamp
@@ -18,6 +20,11 @@ class Tweet:
         self.lang = lang
         self.img_url = img_url
         self.tweet_url = tweet_url
+        self.nb_mentionned_users = nb_mentionned_users
+        self.link_inside_twt = link_inside_twt
+        self.quote = quote
+        self.media = media
+        self.mentionned_users = mentionned_users
 
 
     @classmethod
@@ -44,7 +51,12 @@ class Tweet:
                     'span', 'ProfileTweet-actionCount')['data-tweet-stat-count'] or '0',
             lang = tweet.find('p', 'tweet-text')['lang'] or '',
             img_url = img_url,
-            tweet_url = tweet.find('div', 'tweet')['data-permalink-path'],
+            tweet_url = tweet.find('div', 'tweet')['data-permalink-path'] or '0',
+            nb_mentionned_users = '',
+            mentionned_users = '',
+            link_inside_twt = '',
+            quote = '',
+            media = ''
         )
 
     @classmethod
