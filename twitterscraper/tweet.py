@@ -10,9 +10,10 @@ class Tweet:
     def __init__(self, user, id, timestamp, fullname, text, replies, retweets, likes, lang, img_url, tweet_url,
      nb_mentionned_users, link_inside_twt, quote, media, mentionned_users):
         self.user = user
-        self.id = id
-        self.timestamp = timestamp
         self.fullname = fullname
+        self.id = id
+        self.url = url
+        self.timestamp = timestamp
         self.text = text
         self.replies = replies
         self.retweets = retweets
@@ -25,7 +26,7 @@ class Tweet:
         self.quote = quote
         self.media = media
         self.mentionned_users = mentionned_users
-
+        self.html = html
 
     @classmethod
     def from_soup(cls, tweet):
@@ -35,10 +36,11 @@ class Tweet:
             img_url = ""
         return cls(
             user=tweet.find('span', 'username').text[1:],
+            fullname=tweet.find('strong', 'fullname').text,
             id=tweet['data-item-id'],
+            url = tweet.find('div', 'tweet')['data-permalink-path'],
             timestamp=datetime.utcfromtimestamp(
                 int(tweet.find('span', '_timestamp')['data-time'])),
-            fullname=tweet.find('strong', 'fullname').text,
             text=tweet.find('p', 'tweet-text').text or "",
             replies = tweet.find(
                 'span', 'ProfileTweet-action--reply u-hiddenVisually').find(
@@ -56,7 +58,8 @@ class Tweet:
             mentionned_users = '',
             link_inside_twt = '',
             quote = '',
-            media = ''
+            media = '',
+            html=tweet.find('p', 'tweet-text') or "",
         )
 
     @classmethod
