@@ -29,10 +29,7 @@ class Tweet:
 
     @classmethod
     def from_soup(cls, tweet):
-        #print(tweet.find('div', 'tweet')['data-mentions'])
-
         if tweet.find('div', 'tweet').get('data-mentions'):
-            tweet.find('div', 'tweet').get('data-mentions')
             mentionned_users = tweet.find('div', 'tweet').get('data-mentions')
             nb_mentionned_users = mentionned_users.count(' ') + 1
         else:
@@ -69,7 +66,7 @@ class Tweet:
             link_inside_twt = '',
             quote = '',
             media = '',
-            html= ""
+            html= ''
             #html=str(tweet.find('p', 'tweet-text')) or "",
         )
 
