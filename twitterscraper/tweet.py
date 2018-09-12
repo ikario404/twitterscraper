@@ -4,10 +4,12 @@ from bs4 import BeautifulSoup
 from coala_utils.decorators import generate_ordering
 
 
-@generate_ordering('timestamp', 'id', 'text', 'user', 'replies', 'retweets', 'likes')
+@generate_ordering('timestamp', 'id', 'text', 'user', 'replies', 'retweets', 'likes', 'lang', 'img_url', 'tweet_url',
+ 'nb_mentionned_users', 'link_inside_twt', 'quote', 'media', 'mentionned_users','url', 'html')
 class Tweet:
-    def __init__(self, user, fullname, id, url, timestamp, text, replies, retweets, likes, html):
-        self.user = user.strip('\@')
+    def __init__(self, user, id ,url ,timestamp, fullname, text, replies, retweets, likes, lang, img_url, tweet_url,
+     nb_mentionned_users, link_inside_twt, quote, media, mentionned_users, html):
+        self.user = user
         self.fullname = fullname
         self.id = id
         self.url = url
@@ -16,15 +18,35 @@ class Tweet:
         self.replies = replies
         self.retweets = retweets
         self.likes = likes
+        self.lang = lang
+        self.img_url = img_url
+        self.tweet_url = tweet_url
+        self.nb_mentionned_users = nb_mentionned_users
+        self.link_inside_twt = link_inside_twt
+        self.quote = quote
+        self.media = media
+        self.mentionned_users = mentionned_users
         self.html = html
 
     @classmethod
     def from_soup(cls, tweet):
+        if tweet.find('div', 'tweet').get('data-mentions'):
+            mentionned_users = tweet.find('div', 'tweet').get('data-mentions')
+            nb_mentionned_users = mentionned_users.count(' ') + 1
+        else:
+            mentionned_users = ""
+            nb_mentionned_users = ""
+
+        if tweet.find('div', 'AdaptiveMedia-photoContainer'):
+            img_url = tweet.find('div', 'AdaptiveMedia-photoContainer').get('data-image-url')
+        else:
+            img_url = ""
+        
         return cls(
-            user=tweet.find('span', 'username').text or "",
-            fullname=tweet.find('strong', 'fullname').text or "", 
-            id=tweet['data-item-id'] or "",
-            url = tweet.find('div', 'tweet')['data-permalink-path'] or "",
+            user=tweet.find('span', 'username').text[1:],
+            fullname=tweet.find('strong', 'fullname').text,
+            id=tweet['data-item-id'],
+            url = tweet.find('div', 'tweet')['data-permalink-path'],
             timestamp=datetime.utcfromtimestamp(
                 int(tweet.find('span', '_timestamp')['data-time'])),
             text=tweet.find('p', 'tweet-text').text or "",
@@ -37,8 +59,18 @@ class Tweet:
             likes = tweet.find(
                 'span', 'ProfileTweet-action--favorite u-hiddenVisually').find(
                     'span', 'ProfileTweet-actionCount')['data-tweet-stat-count'] or '0',
-            html=str(tweet.find('p', 'tweet-text')) or "",
+            lang = tweet.find('p', 'tweet-text')['lang'] or '',
+            img_url = img_url,
+            tweet_url = 'https://twitter.com' + tweet.find('div', 'tweet')['data-permalink-path'] or '0',
+            mentionned_users = mentionned_users,
+            nb_mentionned_users = nb_mentionned_users,
+            link_inside_twt = '',
+            quote = '',
+            media = '',
+            html= ''
+            #html=str(tweet.find('p', 'tweet-text')) or "",
         )
+
 
     @classmethod
     def from_html(cls, html):
