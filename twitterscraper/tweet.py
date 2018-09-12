@@ -3,7 +3,10 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from coala_utils.decorators import generate_ordering
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> f28359bd02aa64b5b681e095892f107b05c1bc63
 @generate_ordering('timestamp', 'id', 'text', 'user', 'replies', 'retweets', 'likes', 'lang', 'img_url', 'tweet_url',
  'nb_mentionned_users', 'link_inside_twt', 'quote', 'media', 'mentionned_users','url', 'html')
 class Tweet:
